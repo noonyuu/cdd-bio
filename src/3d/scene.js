@@ -167,7 +167,7 @@ function sideGeometry() {
 // ---------- 液体 ----------
 
 function liquidLevel(stats) {
-  if (stats.tier.id === "overdose") return MUG.height - 0.01;
+  if (stats.tier === "overdose") return MUG.height - 0.01;
   const bottom = MUG.floor + 0.08;
   const top = MUG.height - 0.2;
   return bottom + stats.fillLevel * (top - bottom);
@@ -175,7 +175,7 @@ function liquidLevel(stats) {
 
 function createLiquid(stats) {
   const level = liquidLevel(stats);
-  const overflowing = stats.tier.id === "overdose";
+  const overflowing = stats.tier === "overdose";
   const bulge = overflowing ? 0.07 : 0;
 
   const crema = new THREE.CanvasTexture(cremaCanvas());
@@ -194,7 +194,7 @@ function createLiquid(stats) {
     const r2 = Math.min(1, (x * x + z * z) / LIQUID_RADIUS ** 2);
     const ripple = Math.sin(3.1 * x + TAU * phase) * 0.55 + Math.sin(2.4 * z - TAU * 2 * phase + 1.3) * 0.35 + Math.sin(7.5 * Math.sqrt(r2) - TAU * 3 * phase) * 0.3 * (1 - r2);
     const edgeDrop = overflowing ? -0.06 * r2 ** 6 : 0;
-    return level + WAVE_AMPLITUDE[stats.tier.id] * ripple * (1 - r2 * 0.6) + bulge * (1 - r2) + edgeDrop;
+    return level + WAVE_AMPLITUDE[stats.tier] * ripple * (1 - r2 * 0.6) + bulge * (1 - r2) + edgeDrop;
   };
 
   const update = (phase) => {
@@ -425,14 +425,14 @@ export function createCaffeineScene(canvas, { stats, theme: themeName, width, he
   scene.add(mug);
 
   const updaters = [];
-  if (stats.tier.id === "empty") {
+  if (stats.tier === "empty") {
     mug.add(createResidue());
   } else {
     const liquid = createLiquid(stats);
     mug.add(liquid.group);
     updaters.push(liquid.update);
   }
-  if (stats.tier.id === "overdose") {
+  if (stats.tier === "overdose") {
     const spill = createSpill();
     mug.add(spill.group);
     scene.add(createPuddle());
@@ -443,7 +443,7 @@ export function createCaffeineScene(canvas, { stats, theme: themeName, width, he
   const baseYaw = 0.4;
   const renderAt = (phase) => {
     mug.rotation.y = baseYaw + Math.sin(phase * TAU) * 0.22;
-    if (stats.tier.id === "overdose") {
+    if (stats.tier === "overdose") {
       // ループの頭で一度だけ小刻みに震える
       const envelope = phase < 0.22 ? Math.sin((Math.PI * phase) / 0.22) ** 2 : 0;
       mug.rotation.z = Math.sin(phase * TAU * 14) * 0.022 * envelope;
