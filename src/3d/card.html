@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>caffeine meter 3D</title>
+    <link rel="stylesheet" href="/node_modules/@fontsource-variable/fraunces/opsz.css" />
+    <link rel="stylesheet" href="/node_modules/@fontsource-variable/fraunces/opsz-italic.css" />
+    <link rel="stylesheet" href="/node_modules/@fontsource/zen-kaku-gothic-new/500.css" />
+    <link rel="stylesheet" href="/node_modules/@fontsource/zen-kaku-gothic-new/700.css" />
+    <link rel="stylesheet" href="./card.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/node_modules/three/build/three.module.js",
+          "three/addons/": "/node_modules/three/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="card" class="card">
+      <canvas id="scene"></canvas>
+      <section class="panel">
+        <header class="heading">
+          <span class="title">Caffeine Meter</span>
+          <span class="year"></span>
+        </header>
+        <div class="summary">
+          <p class="amount"></p>
+          <span class="streak"></span>
+        </div>
+        <ol class="bars"></ol>
+      </section>
+    </div>
+    <script type="module" src="./card.js"></script>
+  </body>
+</html>
