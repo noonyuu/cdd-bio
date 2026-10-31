@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="256" viewBox="0 0 600 256" role="img" aria-label="カフェインメーター: 直近7日で 263杯">
+  <title>カフェインメーター: 直近7日で 263杯</title>
+  <defs>
+    <clipPath id="mug-inside"><path d="M64 72 H166 V178 Q166 194 150 194 H80 Q64 194 64 178 Z"/></clipPath>
+    <linearGradient id="coffee-gradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a5a3b"/>
+      <stop offset="1" stop-color="#4a2c1a"/>
+    </linearGradient>
+  </defs>
+  
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif; }
+    .card { fill: #17120f; stroke: #3a2d24; }
+    .ink, .big, .unit { fill: #f3e7d9; }
+    .big { font-size: 46px; font-weight: 800; letter-spacing: -1px; }
+    .unit { font-size: 20px; font-weight: 700; }
+    .caption { font-size: 13px; fill: #a8927d; }
+    .title { font-size: 12px; font-weight: 700; letter-spacing: 3px; fill: #a8927d; }
+    .meta { font-size: 12px; font-weight: 600; fill: #f3e7d9; }
+    .small { font-size: 12px; fill: #a8927d; }
+    .tiny { font-size: 10px; fill: #a8927d; }
+    .day { font-size: 11px; fill: #a8927d; }
+    .day-today { fill: #f3e7d9; font-weight: 700; }
+    .bar { fill: #5b4535; transform-box: fill-box; transform-origin: 50% 100%; animation: grow 0.6s cubic-bezier(.2,.8,.2,1) both; }
+    .bar-today { fill: #d9a875; }
+    .saucer { fill: #2a211b; stroke: #f3e7d9; stroke-width: 2; }
+    .glass { fill: #ffffff; fill-opacity: 0.06; }
+    .mug-outline { fill: none; stroke: #f3e7d9; stroke-width: 3; stroke-linejoin: round; }
+    .handle-outline { fill: none; stroke: #f3e7d9; stroke-width: 13; }
+    .handle-inner { fill: none; stroke: #17120f; stroke-width: 7; }
+    .shine { fill: #ffffff; fill-opacity: 0.18; }
+    .crema { fill: #d9a875; }
+    .coffee { fill: url(#coffee-gradient); }
+    .residue { fill: #8a5a3b; fill-opacity: 0.35; }
+    .puddle { fill: #8a5a3b; fill-opacity: 0.85; }
+    .run { fill: none; stroke: #8a5a3b; stroke-width: 5; stroke-linecap: round; }
+    .steam { fill: none; stroke: #d8c8b8; stroke-width: 4; stroke-linecap: round; opacity: 0.6;
+             animation: steam 1.4s ease-in-out infinite; }
+    .zzz { fill: #a8927d; font-weight: 700; animation: doze 2.1s ease-in-out infinite; }
+    .wave-back { animation: wave 3.2s linear infinite reverse; }
+    .wave-front { animation: wave 2.4s linear infinite; }
+    .drip { animation: drip 1.6s ease-in infinite; }
+    .shake { transform-origin: 115px 200px; animation: shake 2.4s ease-in-out infinite; }
+
+    @keyframes wave { to { transform: translateX(49px); } }
+    @keyframes steam {
+      0% { opacity: 0; transform: translateY(8px); }
+      35% { opacity: 0.85; }
+      100% { opacity: 0; transform: translateY(-12px); }
+    }
+    @keyframes doze {
+      0% { opacity: 0; transform: translate(0, 4px); }
+      40% { opacity: 1; }
+      100% { opacity: 0; transform: translate(8px, -10px); }
+    }
+    @keyframes drip {
+      0% { opacity: 0; transform: translateY(-14px) scale(0.4); }
+      20% { opacity: 1; transform: translateY(-10px) scale(1); }
+      85% { opacity: 1; transform: translateY(82px); }
+      100% { opacity: 0; transform: translateY(86px); }
+    }
+    @keyframes shake {
+      0%, 24%, 100% { transform: rotate(0deg); }
+      4%, 12%, 20% { transform: rotate(-1.6deg); }
+      8%, 16% { transform: rotate(1.6deg); }
+    }
+    @keyframes grow { from { transform: scaleY(0); } }
+    @media (prefers-reduced-motion: reduce) { .anim { animation: none !important; } }
+  </style>
+  <rect x="0.5" y="0.5" width="599" height="255" rx="14" class="card"/>
+  
+  <ellipse cx="115" cy="203" rx="78" ry="9" class="saucer"/>
+  <ellipse cx="115" cy="203" rx="70" ry="5" class="puddle"/>
+  <g class="anim shake">
+    <path d="M172 100 C212 100 212 168 172 168" class="handle-outline"/>
+    <path d="M172 100 C212 100 212 168 172 168" class="handle-inner"/>
+    <path d="M58 78 H172 V180 Q172 200 152 200 H78 Q58 200 58 180 Z" class="glass"/>
+    
+    <g clip-path="url(#mug-inside)">
+      <g transform="translate(0 76.0)">
+        <path d="M15 0 Q27.25 -3.5 39.5 0 T64 0 T88.5 0 T113 0 T137.5 0 T162 0 T186.5 0 T211 0 V130 H15 Z" class="crema anim wave-back"/>
+      </g>
+      <g transform="translate(0 81.0)">
+        <path d="M15 0 Q27.25 -3 39.5 0 T64 0 T88.5 0 T113 0 T137.5 0 T162 0 T186.5 0 T211 0 V130 H15 Z" class="coffee anim wave-front"/>
+      </g>
+    </g>
+    <rect x="72" y="92" width="7" height="84" rx="3.5" class="shine"/>
+    <rect x="84" y="92" width="3" height="36" rx="1.5" class="shine"/>
+    <path d="M58 78 H172 V180 Q172 200 152 200 H78 Q58 200 58 180 Z" class="mug-outline"/>
+    
+    <path d="M60 79 q-6 12 -1 30" class="run"/>
+    <path d="M170 79 q6 18 1 44" class="run"/>
+    <g transform="translate(57 104)"><path d="M0 0 C3 5 5 8 5 11 A5 5 0 0 1 -5 11 C-5 8 -3 5 0 0 Z" class="coffee anim drip"/></g>
+    <g transform="translate(173 118)"><path d="M0 0 C3 5 5 8 5 11 A5 5 0 0 1 -5 11 C-5 8 -3 5 0 0 Z" class="coffee anim drip" style="animation-delay:-0.8s"/></g>
+  </g>
+  
+    <g transform="translate(92 68)">
+      <path d="M0 0 c-7 -8 7 -14 0 -22 s7 -14 0 -22" class="steam anim" style="animation-delay:0.0s"/>
+    </g>
+    <g transform="translate(115 68)">
+      <path d="M0 0 c-7 -8 7 -14 0 -22 s7 -14 0 -22" class="steam anim" style="animation-delay:-0.9s"/>
+    </g>
+    <g transform="translate(138 68)">
+      <path d="M0 0 c-7 -8 7 -14 0 -22 s7 -14 0 -22" class="steam anim" style="animation-delay:-1.8s"/>
+    </g>
+  
+  <text x="115" y="236" text-anchor="middle" class="small">直近1年 5,270杯</text>
+  
+  <text x="250" y="44" class="title">CAFFEINE METER</text>
+  <text x="576" y="44" text-anchor="end" class="meta">221日連続摂取</text>
+  <text x="248" y="96" class="ink"><tspan class="big">263</tspan><tspan dx="6" class="unit">杯</tspan><tspan dx="10" class="caption">/ 直近7日</tspan></text>
+  
+    <rect x="260.3" y="205.3" width="26" height="8.7" rx="4" class="bar anim " style="animation-delay:0.00s"/>
+    <text x="273.3" y="200.3" text-anchor="middle" class="tiny">7</text>
+    <text x="273.3" y="230" text-anchor="middle" class="day">日</text>
+    <rect x="306.9" y="166.7" width="26" height="47.3" rx="4" class="bar anim " style="animation-delay:0.08s"/>
+    <text x="319.9" y="161.7" text-anchor="middle" class="tiny">38</text>
+    <text x="319.9" y="230" text-anchor="middle" class="day">月</text>
+    <rect x="353.4" y="171.7" width="26" height="42.3" rx="4" class="bar anim " style="animation-delay:0.16s"/>
+    <text x="366.4" y="166.7" text-anchor="middle" class="tiny">34</text>
+    <text x="366.4" y="230" text-anchor="middle" class="day">火</text>
+    <rect x="400.0" y="148.0" width="26" height="66.0" rx="4" class="bar anim " style="animation-delay:0.24s"/>
+    <text x="413.0" y="143.0" text-anchor="middle" class="tiny">53</text>
+    <text x="413.0" y="230" text-anchor="middle" class="day">水</text>
+    <rect x="446.6" y="170.4" width="26" height="43.6" rx="4" class="bar anim " style="animation-delay:0.32s"/>
+    <text x="459.6" y="165.4" text-anchor="middle" class="tiny">35</text>
+    <text x="459.6" y="230" text-anchor="middle" class="day">木</text>
+    <rect x="493.1" y="156.7" width="26" height="57.3" rx="4" class="bar anim " style="animation-delay:0.40s"/>
+    <text x="506.1" y="151.7" text-anchor="middle" class="tiny">46</text>
+    <text x="506.1" y="230" text-anchor="middle" class="day">金</text>
+    <rect x="539.7" y="151.7" width="26" height="62.3" rx="4" class="bar anim bar-today" style="animation-delay:0.48s"/>
+    <text x="552.7" y="146.7" text-anchor="middle" class="tiny">50</text>
+    <text x="552.7" y="230" text-anchor="middle" class="day day-today">今日</text>
+</svg>
