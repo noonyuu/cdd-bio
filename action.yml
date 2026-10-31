@@ -1,0 +1,181 @@
+name: Caffeine Meter
+description: GitHub の contribution をガラスのマグに注いだコーヒーとして、プロフィール README に表示する
+author: noonyuu
+branding:
+  icon: coffee
+  color: orange
+
+inputs:
+  format:
+    description: svg（設定不要の軽量版）か webp（three.js の 3D 版。Pages の公開元を GitHub Actions にする設定が必要）
+    default: svg
+  username:
+    description: contribution を数える GitHub ユーザー名
+    default: ${{ github.repository_owner }}
+  readme_path:
+    description: 目印コメントの間に画像を差し込む README のパス。空にすると README は書き換えない
+    default: README.md
+  output_branch:
+    description: svg のときに画像を置くブランチ
+    default: output
+  keepalive:
+    description: 50 日コミットがなければ空のコミットを入れて、GitHub が定期実行を止めるのを防ぐ
+    default: "true"
+  commit_message:
+    description: README を更新したときのコミットメッセージ
+    default: "chore: update caffeine meter"
+  gh_token:
+    description: contribution の取得と画像の push に使うトークン
+    default: ${{ github.token }}
+
+outputs:
+  light_url:
+    description: ライトテーマ用の画像の URL
+    value: ${{ steps.urls.outputs.light }}
+  dark_url:
+    description: ダークテーマ用の画像の URL
+    value: ${{ steps.urls.outputs.dark }}
+  page_url:
+    description: webp のときの Pages の URL
+    value: ${{ steps.pages.outputs.page_url }}
+
+runs:
+  using: composite
+  steps:
+    - name: Check inputs
+      shell: bash
+      env:
+        FORMAT: ${{ inputs.format }}
+      run: |
+        case "$FORMAT" in
+          svg | webp) ;;
+          *) echo "::error::format には svg か webp を指定してください（指定値: $FORMAT）"; exit 1 ;;
+        esac
+
+    # SVG 版は依存パッケージなしで動く
+    - name: Render SVG
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.gh_token }}
+        CDD_USER: ${{ inputs.username }}
+      run: node src/generate.mjs --user "$CDD_USER"
+
+    # 3D 版だけ three.js・Playwright・sharp を入れる。Chrome はランナーに最初から入っているものを使う
+    - name: Install dependencies for 3D
+      if: inputs.format == 'webp'
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: npx --yes pnpm@11.24.0 install --frozen-lockfile
+
+    # ランナーに GPU はないので、Chrome 内蔵の SwiftShader（CPU）で WebGL を描く
+    - name: Render 3D (animated WebP)
+      if: inputs.format == 'webp'
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.gh_token }}
+        CDD_USER: ${{ inputs.username }}
+      run: node src/render3d.mjs --user "$CDD_USER" --swiftshader
+
+    # main に bot のコミットを積まないよう、画像だけを別ブランチへ強制 push する
+    - name: Publish SVG to output branch
+      if: inputs.format == 'svg'
+      shell: bash
+      working-directory: ${{ github.action_path }}/dist
+      env:
+        GITHUB_TOKEN: ${{ inputs.gh_token }}
+        BRANCH: ${{ inputs.output_branch }}
+        GIT_AUTHOR_NAME: github-actions[bot]
+        GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        GIT_COMMITTER_NAME: github-actions[bot]
+        GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+      run: |
+        rm -rf .git
+        git init --quiet --initial-branch "$BRANCH"
+        git add caffeine-light.svg caffeine-dark.svg
+        git commit --quiet --message "brew $(date -u +%Y-%m-%dT%H:%MZ)"
+        git push --force --quiet "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${BRANCH}"
+
+    # WebP は raw.githubusercontent.com だと画像として配信されないので、Pages から配信する
+    - name: Collect files for Pages
+      if: inputs.format == 'webp'
+      shell: bash
+      env:
+        SITE: ${{ runner.temp }}/caffeine-meter-site
+      run: |
+        mkdir -p "$SITE"
+        cp "$GITHUB_ACTION_PATH"/dist/caffeine-*.webp "$GITHUB_ACTION_PATH"/dist/caffeine-*.svg "$SITE"/
+
+    - name: Upload Pages artifact
+      if: inputs.format == 'webp'
+      uses: actions/upload-pages-artifact@v5
+      with:
+        path: ${{ runner.temp }}/caffeine-meter-site
+
+    - name: Deploy to Pages
+      id: pages
+      if: inputs.format == 'webp'
+      uses: actions/deploy-pages@v5
+
+    - name: Resolve image URLs
+      id: urls
+      shell: bash
+      env:
+        FORMAT: ${{ inputs.format }}
+        BRANCH: ${{ inputs.output_branch }}
+        PAGE_URL: ${{ steps.pages.outputs.page_url }}
+      run: |
+        if [ "$FORMAT" = webp ]; then
+          base="${PAGE_URL%/}"
+        else
+          base="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${BRANCH}"
+        fi
+        echo "light=${base}/caffeine-light.${FORMAT}" >> "$GITHUB_OUTPUT"
+        echo "dark=${base}/caffeine-dark.${FORMAT}" >> "$GITHUB_OUTPUT"
+
+    # URL は毎回同じなので、README が変わるのは初回と format を変えたときだけ
+    - name: Update README
+      if: inputs.readme_path != ''
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      env:
+        README: ${{ inputs.readme_path }}
+        LIGHT: ${{ steps.urls.outputs.light }}
+        DARK: ${{ steps.urls.outputs.dark }}
+        MESSAGE: ${{ inputs.commit_message }}
+        GIT_AUTHOR_NAME: github-actions[bot]
+        GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        GIT_COMMITTER_NAME: github-actions[bot]
+        GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+      run: |
+        if [ ! -f "$README" ]; then
+          echo "::error::$README が見つかりません。先に actions/checkout を実行するか、readme_path を指定してください"
+          exit 1
+        fi
+        result=$(node "$GITHUB_ACTION_PATH/src/update-readme.mjs" --file "$README" --light "$LIGHT" --dark "$DARK")
+        if [ "$result" = changed ]; then
+          git add "$README"
+          git commit --quiet --message "$MESSAGE"
+          git push --quiet origin "HEAD:${GITHUB_REF_NAME}"
+        fi
+
+    - name: Keepalive
+      if: inputs.keepalive == 'true'
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      env:
+        GIT_AUTHOR_NAME: github-actions[bot]
+        GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        GIT_COMMITTER_NAME: github-actions[bot]
+        GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+      run: |
+        if ! git rev-parse --git-dir > /dev/null 2>&1; then
+          echo "::notice::actions/checkout がないので keepalive をスキップしました"
+          exit 0
+        fi
+        last_commit=$(git log -1 --format=%ct)
+        if (( $(date +%s) - last_commit > 50 * 86400 )); then
+          git commit --allow-empty --quiet --message "chore: keepalive (caffeine meter)"
+          git push --quiet origin "HEAD:${GITHUB_REF_NAME}"
+        fi
