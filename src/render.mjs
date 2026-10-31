@@ -36,12 +36,12 @@ function wavePath(amplitude) {
 }
 
 function liquidTop(stats) {
-  if (stats.tier.id === "overdose") return MUG_INSIDE_TOP - 4;
+  if (stats.tier === "overdose") return MUG_INSIDE_TOP - 4;
   return MUG_INSIDE_BOTTOM - stats.fillLevel * (MUG_INSIDE_BOTTOM - LIQUID_MAX_TOP);
 }
 
 function renderLiquid(stats) {
-  if (stats.tier.id === "empty") {
+  if (stats.tier === "empty") {
     // 飲み干したあとの輪じみ
     return `<ellipse cx="115" cy="189" rx="40" ry="3" class="residue"/>`;
   }
@@ -61,7 +61,7 @@ const STEAM_COUNT = { empty: 0, low: 1, normal: 2, high: 3, overdose: 3 };
 const STEAM_XS = [[], [115], [101, 129], [92, 115, 138]];
 
 function renderSteam(stats) {
-  return STEAM_XS[STEAM_COUNT[stats.tier.id]]
+  return STEAM_XS[STEAM_COUNT[stats.tier]]
     .map(
       (x, index) => `
     <g transform="translate(${x} 68)">
@@ -72,7 +72,7 @@ function renderSteam(stats) {
 }
 
 function renderSleep(stats) {
-  if (stats.tier.id !== "empty") return "";
+  if (stats.tier !== "empty") return "";
   const letters = [
     { x: 136, y: 66, size: 13 },
     { x: 146, y: 52, size: 16 },
@@ -82,7 +82,7 @@ function renderSleep(stats) {
 }
 
 function renderSpill(stats) {
-  if (stats.tier.id !== "overdose") return { behind: "", front: "" };
+  if (stats.tier !== "overdose") return { behind: "", front: "" };
   const drop = "M0 0 C3 5 5 8 5 11 A5 5 0 0 1 -5 11 C-5 8 -3 5 0 0 Z";
   return {
     behind: `<ellipse cx="115" cy="203" rx="70" ry="5" class="puddle"/>`,
@@ -96,7 +96,7 @@ function renderSpill(stats) {
 
 function renderMug(stats) {
   const spill = renderSpill(stats);
-  const shakeClass = stats.tier.id === "overdose" ? "anim shake" : "";
+  const shakeClass = stats.tier === "overdose" ? "anim shake" : "";
   return `
   <ellipse cx="115" cy="203" rx="78" ry="9" class="saucer"/>
   ${spill.behind}
@@ -145,7 +145,7 @@ function renderPanel(stats) {
 }
 
 function renderStyle(stats, theme) {
-  const fast = stats.tier.id === "overdose";
+  const fast = stats.tier === "overdose";
   return `
   <style>
     text { font-family: ${FONT_STACK}; }
@@ -214,8 +214,8 @@ function renderStyle(stats, theme) {
  */
 export function renderSvg(stats, themeName = "light") {
   const theme = THEMES[themeName];
-  const summary = `カフェインメーター: 直近7日で ${numberFormat.format(stats.weekTotal)}杯（${stats.tier.label}）`;
-  const insideTop = stats.tier.id === "overdose" ? MUG_INSIDE_TOP - 8 : MUG_INSIDE_TOP;
+  const summary = `カフェインメーター: 直近7日で ${numberFormat.format(stats.weekTotal)}杯`;
+  const insideTop = stats.tier === "overdose" ? MUG_INSIDE_TOP - 8 : MUG_INSIDE_TOP;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}" role="img" aria-label="${escapeXml(summary)}">
   <title>${escapeXml(summary)}</title>
   <defs>
