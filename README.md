@@ -34,6 +34,9 @@ CSS アニメーションだけで描いた軽量版です（約 8KB、生成は
      schedule:
        - cron: "23 */3 * * *" # 3時間ごと
      workflow_dispatch:
+     push: # このファイルをコミットしたときに初回が動く
+       branches: [main]
+       paths: [.github/workflows/caffeine-meter.yml]
    permissions:
      contents: write
    jobs:
@@ -44,7 +47,8 @@ CSS アニメーションだけで描いた軽量版です（約 8KB、生成は
          - uses: noonyuu/cdd-bio@v1
    ```
 
-3. Actions タブで **Caffeine meter** を開き、**Run workflow** で一度動かします。
+3. コミットして push すると、初回が自動で動きます（以降は 3 時間ごと。すぐ動かし直したいときは Actions タブの **Run workflow**）。
+   デフォルトブランチが `main` 以外の場合は、`branches` をそのブランチ名に替えてください。
 
 画像は `output` ブランチに置かれ、README の目印の間に `<picture>` が入ります。
 
@@ -62,6 +66,9 @@ three.js で描いたガラスのマグを、4 秒ループのアニメーショ
      schedule:
        - cron: "23 */3 * * *" # 3時間ごと
      workflow_dispatch:
+     push: # このファイルをコミットしたときに初回が動く
+       branches: [main]
+       paths: [.github/workflows/caffeine-meter.yml]
    concurrency:
      group: caffeine-meter
      cancel-in-progress: false
@@ -83,7 +90,8 @@ three.js で描いたガラスのマグを、4 秒ループのアニメーショ
              format: webp
    ```
 
-4. Actions タブで **Run workflow** を一度動かします。
+4. コミットして push すると、初回が自動で動きます。1 の Pages の設定を済ませてから push してください（先に push すると Pages へのデプロイで止まります）。
+   デフォルトブランチが `main` 以外の場合は、`branches` をそのブランチ名に替えてください。
 
 WebP は Pages から配信します。`raw.githubusercontent.com` は `.webp` を画像として返さない（`application/octet-stream` になる）ためです。
 そのリポジトリの Pages は、このメーターの画像の配信に使われます。
@@ -114,6 +122,7 @@ WebP は Pages から配信します。`raw.githubusercontent.com` は `.webp` �
 - ランナーの Node.js（22 以上）で動きます。前のステップで古い Node.js に切り替えている場合は動きません。
 - private リポジトリでの contribution も数えたい場合は、GitHub のプロフィール設定で **Private contributions** を表示する設定にしてください。
 - README の更新でコミットが入るのは、初回と `format` を変えたときだけです（画像の URL は毎回同じなので）。
+- Action が入れるコミットは GitHub の仕様で次のワークフローを起動しないので、`push` トリガーがあってもループしません。
 
 ## しくみ
 
