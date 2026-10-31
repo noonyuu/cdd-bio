@@ -2,6 +2,7 @@
   "name": "cdd-bio",
   "private": true,
   "description": "CDD (カフェイン駆動開発) の摂取量をGitHubプロフィールに表示するマグカップメーター",
+  "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@11.24.0",
   "engines": {

@@ -149,3 +149,9 @@ pnpm run preview                                                          # SVG 
 
 3D 版をブラウザでループ再生しながら調整するときは、プロジェクト直下を静的サーバーで配信して
 `/src/3d/card.html?scenario=overdose&theme=dark` を開きます（`scenario` は `empty` / `low` / `normal` / `high` / `overdose` / `spike`）。
+
+## ライセンス
+
+[MIT](LICENSE)
+
+依存パッケージ（npm から取得）のライセンスは、フォントの Fraunces と Zen Kaku Gothic New が SIL Open Font License、three.js が MIT、Playwright と sharp が Apache-2.0 です。
