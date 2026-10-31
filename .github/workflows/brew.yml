@@ -1,0 +1,59 @@
+name: Brew caffeine meter
+
+on:
+  schedule:
+    - cron: "23 */3 * * *" # 3時間ごと
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: brew
+  cancel-in-progress: true
+
+jobs:
+  brew:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm test
+
+      - name: Generate SVG
+        run: node src/generate.mjs --user "${{ github.repository_owner }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ランナーに GPU はないので、Chrome 内蔵の SwiftShader（CPU）で WebGL を描く。
+      # Chrome はランナーに最初から入っているものを使う。
+      - name: Render 3D (animated WebP)
+        run: node src/render3d.mjs --user "${{ github.repository_owner }}" --swiftshader
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # main に bot のコミットを積まないよう、画像だけを output ブランチへ強制 push する。
+      # WebP は raw.githubusercontent.com だと正しい Content-Type で配信されないので、
+      # output ブランチを GitHub Pages で公開して、そちらの URL から読む。
+      - name: Publish to output branch
+        working-directory: dist
+        run: |
+          touch .nojekyll
+          git init --quiet --initial-branch output
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .nojekyll caffeine-light.svg caffeine-dark.svg caffeine-light.webp caffeine-dark.webp
+          git commit --quiet --message "brew $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push --force --quiet "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" output
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
