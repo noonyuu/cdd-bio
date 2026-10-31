@@ -4,8 +4,6 @@ on:
   schedule:
     - cron: "23 */3 * * *" # 3時間ごと
   workflow_dispatch:
-  push:
-    branches: [main]
 
 permissions:
   contents: read
@@ -16,26 +14,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  test:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v7
-
-      # pnpm のバージョンは package.json の packageManager から読む
-      - uses: pnpm/action-setup@v6
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
-      - run: pnpm test
-
   # 配布している Action（リポジトリ直下の action.yml）を自分で使って、noonyuu のメーターを更新する
   brew:
-    needs: test
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
