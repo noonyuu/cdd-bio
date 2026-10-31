@@ -1,0 +1,22 @@
+{
+  "name": "cdd-bio",
+  "private": true,
+  "description": "CDD (カフェイン駆動開発) の摂取量をGitHubプロフィールに表示するマグカップメーター",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "generate": "node src/generate.mjs",
+    "preview": "node src/preview.mjs",
+    "render3d": "node src/render3d.mjs",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource/zen-kaku-gothic-new": "^5.3.1",
+    "playwright-core": "^1.64.1",
+    "sharp": "^0.35.5",
+    "three": "^0.187.0"
+  }
+}
