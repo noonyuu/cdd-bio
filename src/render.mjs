@@ -136,10 +136,8 @@ function renderBars(stats) {
 }
 
 function renderPanel(stats) {
-  const streak = stats.streak > 0 ? `${stats.streak}日連続摂取` : "連続記録なし";
   return `
   <text x="${PANEL_X}" y="44" class="title">CAFFEINE METER</text>
-  <text x="${PANEL_RIGHT}" y="44" text-anchor="end" class="meta">${streak}</text>
   <text x="${PANEL_X - 2}" y="96" class="ink"><tspan class="big">${numberFormat.format(stats.weekTotal)}</tspan><tspan dx="6" class="unit">杯</tspan><tspan dx="10" class="caption">/ 直近7日</tspan></text>
   ${renderBars(stats)}`;
 }

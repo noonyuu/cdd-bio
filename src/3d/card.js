@@ -24,7 +24,6 @@ function applyTheme(themeName) {
 
 function fillPanel(stats) {
   $(".year").innerHTML = `直近1年<b>${format(stats.yearTotal)}</b>杯`;
-  $(".streak").innerHTML = stats.streak > 0 ? `<b>${stats.streak}</b>日連続摂取` : "連続記録なし";
   $(".amount").innerHTML = `<span class="number">${format(stats.weekTotal)}</span><span class="unit">杯</span><span class="window">/ 直近7日</span>`;
 
   const max = Math.max(1, ...stats.week.map((day) => day.count));
