@@ -1,0 +1,73 @@
+name: Release
+
+# v1.2.3 のような不変タグを push すると、テストを通したうえでメジャータグ（v1）をそこへ付け替える。
+# 使用者は `uses: noonyuu/cdd-bio@v1` で参照しているので、付け替えた時点で全員に届く
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: read
+
+# 続けてタグを打ったときに、古い方が後から v1 を上書きしないよう順番に流す
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      # pnpm のバージョンは package.json の packageManager から読む
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm test
+
+  move-major-tag:
+    needs: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Move major tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          if [[ ! "$TAG" =~ ^(v[0-9]+)\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::$TAG は vX.Y.Z の形式ではありません"
+            exit 1
+          fi
+          major="${BASH_REMATCH[1]}"
+
+          # main に入っていないコミットを使用者へ配らない
+          git fetch --quiet origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::$TAG のコミット（$GITHUB_SHA）が main に含まれていません"
+            exit 1
+          fi
+
+          # 古いバージョンのタグを後から打っても、メジャータグを巻き戻さない
+          latest=$(git tag --list "${major}.*.*" --sort=-version:refname | head -n 1)
+          if [ "$latest" != "$TAG" ]; then
+            echo "::notice::$TAG は最新（$latest）ではないので、$major は動かしません"
+            exit 0
+          fi
+
+          git tag --force "$major" "$GITHUB_SHA"
+          git push --force origin "refs/tags/${major}"
+          echo "::notice::$major を $TAG（$GITHUB_SHA）へ付け替えました"
